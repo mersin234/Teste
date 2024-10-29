@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist de Inspeção de Lava Olhos</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 90%; max-width: 600px; margin: auto; padding: 20px; }
+        h2 { text-align: center; }
+        .question { margin: 15px 0; }
+        .checkbox { display: inline-block; width: 25px; height: 25px; border: 2px solid #555; cursor: pointer; }
+        .checkbox.checked { background-color: #4CAF50; color: white; text-align: center; }
+        .checkmark { font-size: 20px; display: none; }
+        .checkbox.checked .checkmark { display: block; }
+        button { width: 100%; padding: 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; font-size: 18px; margin-top: 20px; }
+        button:disabled { background-color: #999; cursor: not-allowed; }
+        input[type="text"], textarea { width: 100%; padding: 10px; margin-top: 10px; }
+        .photo-preview { width: 100%; height: auto; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Checklist de Inspeção de Lava Olhos</h2>
+
+        <div class="question">
+            <p>Dia e mês:</p>
+            <input type="text" name="diaMes" required>
+        </div>
+        
+        <div class="question">
+            <p>Local:</p>
+            <input type="text" name="local" required>
+        </div>
+
+        <div class="question">
+            <p>Realizado por:</p>
+            <input type="text" name="realizadoPor" required>
+        </div>
+
+        <div class="question">
+            <p>O lava-olhos e o chuveiro estão desobstruídos?</p>
+            <div class="checkbox" onclick="toggleCheckbox(this)" data-checked="false">
+                <span class="checkmark">✔️</span>
+            </div>
+            <input type="file" accept="image/*" capture="camera" class="photo-upload" onchange="uploadPhoto(event)" style="display:none;">
+            <button onclick="document.querySelectorAll('.photo-upload')[0].click();">Tirar Foto</button>
+            <img class="photo-preview" alt="Foto do item" />
+        </div>
+
+        <div class="question">
+            <p>O acionamento do lava-olhos funciona?</p>
+            <div class="checkbox" onclick="toggleCheckbox(this)" data-checked="false">
+                <span class="checkmark">✔️</span>
+            </div>
+            <input type="file" accept="image/*" capture="camera" class="photo-upload" onchange="uploadPhoto(event)" style="display:none;">
+            <button onclick="document.querySelectorAll('.photo-upload')[1].click();">Tirar Foto</button>
+            <img class="photo-preview" alt="Foto do item" />
+        </div>
+
+        <div class="question">
+            <p>A vazão do lava-olhos é suficiente?</p>
+            <div class="checkbox" onclick="toggleCheckbox(this)" data-checked="false">
+                <span class="checkmark">✔️</span>
+            </div>
+            <input type="file" accept="image/*" capture="camera" class="photo-upload" onchange="uploadPhoto(event)" style="display:none;">
+            <button onclick="document.querySelectorAll('.photo-upload')[2].click();">Tirar Foto</button>
+            <img class="photo-preview" alt="Foto do item" />
+        </div>
+
+        <div class="question">
+            <p>A cuba do lava-olhos está limpa?</p>
+            <div class="checkbox" onclick="toggleCheckbox(this)" data-checked="false">
+                <span class="checkmark">✔️</span>
+            </div>
+            <input type="file" accept="image/*" capture="camera" class="photo-upload" onchange="uploadPhoto(event)" style="display:none;">
+            <button onclick="document.querySelectorAll('.photo-upload')[3].click();">Tirar Foto</button>
+            <img class="photo-preview" alt="Foto do item" />
+        </div>
+
+        <div class="question">
+            <p>O acionamento do chuveiro funciona?</p>
+            <div class="checkbox" onclick="toggleCheckbox(this)" data-checked="false">
+                <span class="checkmark">✔️</span>
+            </div>
+            <input type="file" accept="image/*" capture="camera" class="photo-upload" onchange="uploadPhoto(event)" style="display:none;">
+            <button onclick="document.querySelectorAll('.photo-upload')[4].click();">Tirar Foto</button>
+            <img class="photo-preview" alt="Foto do item" />
+        </div>
+
+        <div class="question">
+            <p>A vazão do chuveiro é suficiente?</p>
+            <div class="checkbox" onclick="toggleCheckbox(this)" data-checked="false">
+                <span class="checkmark">✔️</span>
+            </div>
+            <input type="file" accept="image/*" capture="camera" class="photo-upload" onchange="uploadPhoto(event)" style="display:none;">
+            <button onclick="document.querySelectorAll('.photo-upload')[5].click();">Tirar Foto</button>
+            <img class="photo-preview" alt="Foto do item" />
+        </div>
+
+        <div class="question">
+            <p>A água está limpa?</p>
+            <div class="checkbox" onclick="toggleCheckbox(this)" data-checked="false">
+                <span class="checkmark">✔️</span>
+            </div>
+            <input type="file" accept="image/*" capture="camera" class="photo-upload" onchange="uploadPhoto(event)" style="display:none;">
+            <button onclick="document.querySelectorAll('.photo-upload')[6].click();">Tirar Foto</button>
+            <img class="photo-preview" alt="Foto do item" />
+        </div>
+
+        <div class="question">
+            <p>Observações:</p>
+            <textarea name="observacoes" rows="4" style="width: 100%;"></textarea>
+        </div>
+
+        <button id="registerBtn" onclick="registerFingerprint()">Cadastrar Digital</button>
+        <button id="confirmarLiberarYouTube" disabled onclick="submitForm()">Confirmar e Liberar YouTube</button>
+    </div>
+
+    <script>
+        const photos = [];
+
+        function toggleCheckbox(element) {
+            const isChecked = element.getAttribute("data-checked") === "true";
+            element.setAttribute("data-checked", !isChecked);
+            element.classList.toggle("checked", !isChecked);
+            checkAllSelected();
+        }
+
+        function checkAllSelected() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            const allChecked = Array.from(checkboxes).every(box => box.getAttribute("data-checked") === "true");
+            document.getElementById("confirmarLiberarYouTube").disabled = !allChecked;
+        }
+
+        function uploadPhoto(event) {
+            const file = event.target.files[0];
+            const imgPreview = event.target.nextElementSibling;
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imgPreview.src = e.target.result; // Mostrar a foto tirada
+                    photos.push(e.target.result); // Salvar a foto em um array
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function registerFingerprint() {
+            try {
+                const publicKey = {
+                    challenge: new Uint8Array(32),
+                    rp: { name: "Checklist Lava Olhos" },
+                    user: {
+                        id: new Uint8Array(16),
+                        name: "usuario",
+                        displayName: "Usuario Lava Olhos"
+                    },
+                    pubKeyCredParams: [{ type: "public-key", alg: -7 }]
+                };
+
+                const credential = await navigator.credentials.create({ publicKey });
+                
+                if (credential) {
+                    const storedCredential = {
+                        id: Array.from(new Uint8Array(credential.rawId)),
+                        type: credential.type
+                    };
+                    localStorage.setItem("fingerprintCredential", JSON.stringify(storedCredential));
+                    alert("Digital cadastrada com sucesso!");
+                }
+            } catch (error) {
+                alert("Falha ao cadastrar a digital. Tente novamente.");
+            }
+        }
+
+        async function submitForm() {
+            try {
+                const credentialData = JSON.parse(localStorage.getItem("fingerprintCredential"));
+                if (!credentialData) {
+                    alert("Nenhuma digital cadastrada. Realize o cadastro antes.");
+                    return;
+                }
+
+                const publicKeyRequest = {
+                    challenge: new Uint8Array(32),
+                    allowCredentials: [credentialData]
+                };
+
+                const assertion = await navigator.credentials.get({ publicKey: publicKeyRequest });
+                if (assertion) {
+                    const formData = new FormData();
+                    const observacoes = document.querySelector('textarea[name="observacoes"]').value;
+                    const diaMes = document.querySelector('input[name="diaMes"]').value;
+                    const local = document.querySelector('input[name="local"]').value;
+                    const realizadoPor = document.querySelector('input[name="realizadoPor"]').value;
+
+                    formData.append('diaMes', diaMes);
+                    formData.append('local', local);
+                    formData.append('realizadoPor', realizadoPor);
+                    formData.append('observacoes', observacoes);
+                    photos.forEach((photo, index) => {
+                        formData.append(`photo_${index + 1}`, photo);
+                    });
+
+                    // Enviar dados para o Formspree
+                    const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        alert("Checklist enviado com sucesso!");
+                    } else {
+                        alert("Erro ao enviar o checklist. Tente novamente.");
+                    }
+                }
+            } catch (error) {
+                alert("Falha na autenticação da digital. Tente novamente.");
+            }
+        }
+    </script>
+</body>
+</html>
